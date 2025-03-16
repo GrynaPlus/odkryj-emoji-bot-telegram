@@ -324,18 +324,29 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ---------------- Zapobieganie wyświetlaniu odsłoniętych kafelków ----------------
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") {
-      // Przy powrocie do gry zakrywamy wszystkie niezapisane (nie dopasowane) kafelki
-      const tiles = document.querySelectorAll(".tile");
-      tiles.forEach(tile => {
-        if (!tile.classList.contains("matched") && tile.dataset.flipped === "true") {
-          tile.classList.remove("flipped");
-          tile.dataset.flipped = "false";
-        }
-      });
-      flippedTiles = [];
-      saveGameState();
+ // Obsługa widoczności strony – metoda pageshow (przy powrocie z bfcache)
+window.addEventListener("pageshow", (event) => {
+  // Jeśli strona była z bufora (persisted) lub zwykle
+  setTimeout(hideUnmatchedTiles, 10);
+});
+
+// Obsługa visibilitychange z niewielkim opóźnieniem
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    setTimeout(hideUnmatchedTiles, 10);
+  }
+});
+
+// Funkcja zakrywająca wszystkie niezapisane (nie dopasowane) kafelki
+function hideUnmatchedTiles() {
+  const tiles = document.querySelectorAll(".tile");
+  tiles.forEach(tile => {
+    if (!tile.classList.contains("matched") && tile.dataset.flipped === "true") {
+      tile.classList.remove("flipped");
+      tile.dataset.flipped = "false";
     }
   });
-});
+  flippedTiles = [];
+  saveGameState();
+}
+
