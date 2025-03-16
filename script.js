@@ -322,4 +322,20 @@ document.addEventListener("DOMContentLoaded", () => {
       }, 3000);
     }
   }
+
+  // ---------------- Zapobieganie wyświetlaniu odsłoniętych kafelków ----------------
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      // Przy powrocie do gry zakrywamy wszystkie niezapisane (nie dopasowane) kafelki
+      const tiles = document.querySelectorAll(".tile");
+      tiles.forEach(tile => {
+        if (!tile.classList.contains("matched") && tile.dataset.flipped === "true") {
+          tile.classList.remove("flipped");
+          tile.dataset.flipped = "false";
+        }
+      });
+      flippedTiles = [];
+      saveGameState();
+    }
+  });
 });
