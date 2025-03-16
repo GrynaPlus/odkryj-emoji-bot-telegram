@@ -13,8 +13,9 @@ body {
   font-size: 1.2em;
   color: #fff;
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 15px;
+  gap: 10px;
   align-items: center;
 }
 
@@ -36,34 +37,36 @@ body {
   display: none;
 }
 
-/* Plansza gry 6x6 */
+/* Plansza gry – responsywna */
 #board {
+  width: 90%;
+  max-width: 400px;
+  margin: 20px auto;
   display: grid;
-  grid-template-columns: repeat(6, 100px);
-  grid-gap: 15px;
-  justify-content: center;
-  margin-top: 20px;
-  position: relative;
-  padding: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  grid-gap: 10px;
+  padding: 10px;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.2);
   transition: background 1s ease-in-out;
+  position: relative;
 }
 
-/* Styl kafelka */
+/* Styl kafelka – zachowanie proporcji kwadratu */
 .tile {
-  width: 100px;
-  height: 100px;
-  perspective: 1000px;
+  width: 100%;
   position: relative;
   cursor: pointer;
+  padding-top: 100%; /* Utrzymanie kwadratowego kształtu */
 }
 
 /* Kontener wewnętrzny – flip card inner */
 .flip-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   transition: transform 0.6s;
   transform-style: preserve-3d;
 }
@@ -92,17 +95,13 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5em;
+  font-size: 2em;
   transition: transform 0.6s, background-color 0.6s, box-shadow 0.6s;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   background: linear-gradient(145deg, #e0f7fa, #80deea);
   color: #333;
 }
-
-/* Front – pusta */
 .flip-card-front { }
-
-/* Back – zawiera emoji */
 .flip-card-back {
   transform: rotateY(180deg);
   color: #000;
@@ -136,12 +135,12 @@ body {
   margin: 15% auto;
   padding: 20px;
   border-radius: 5px;
-  width: 80%;
+  width: 90%;
   max-width: 300px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
-/* Styl dla modalu wpisywania nicku */
+/* Modal dla wpisywania nicku */
 .modal-nickname {
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -184,19 +183,11 @@ body {
   z-index: 10;
 }
 @keyframes starburst {
-  0% {
-    width: 0;
-    height: 0;
-    opacity: 1;
-  }
-  100% {
-    width: 150px;
-    height: 150px;
-    opacity: 0;
-  }
+  0% { width: 0; height: 0; opacity: 1; }
+  100% { width: 150px; height: 150px; opacity: 0; }
 }
 
-/* Ulepszony efekt konfetti z różnymi kształtami */
+/* Efekt konfetti */
 .confetti {
   position: absolute;
   opacity: 0.8;
@@ -211,7 +202,6 @@ body {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
-/* Kształty konfetti */
 .confetti.circle {
   border-radius: 50%;
 }
@@ -222,33 +212,39 @@ body {
   clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
 }
 
-/* Style dla tabeli rankingu */
+/* Style tabeli rankingu */
 #ranking-table {
   width: 100%;
-  /* Kluczowe ustawienie dla stałej szerokości kolumn i zawijania tekstu */
   table-layout: fixed;
   border-collapse: collapse;
 }
-
 #ranking-table th,
 #ranking-table td {
   border: 1px solid #ccc;
   padding: 5px;
   text-align: center;
-  /* Pozwala na zawijanie długich słów */
   white-space: normal;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
-
-/* Ustaw szerokość drugiej kolumny (Gracz) tak, aby tekst się zawijał */
 #ranking-table th:nth-child(2),
 #ranking-table td:nth-child(2) {
   width: 150px;
 }
 
-/* Ustawienie modalnego okna rankingu, by zawartość się mieściła */
+/* Modal ranking – przewijanie zawartości */
 #ranking-modal .modal-content {
   max-height: 80vh;
   overflow-y: auto;
+}
+
+/* Media queries dla mniejszych ekranów */
+@media (max-width: 480px) {
+  #info-bar {
+    flex-direction: column;
+  }
+  #ranking-table th,
+  #ranking-table td {
+    font-size: 0.9em;
+  }
 }
