@@ -4,13 +4,13 @@ body {
   text-align: center;
   background: linear-gradient(135deg, #4facfe, #00f2fe);
   margin: 0;
-  padding: 20px;
+  padding: 10px;
 }
 
 /* Pasek informacji */
 #info-bar {
-  margin-bottom: 20px;
-  font-size: 1.2em;
+  margin-bottom: 10px;
+  font-size: 1em;
   color: #fff;
   display: flex;
   flex-wrap: wrap;
@@ -37,36 +37,37 @@ body {
   display: none;
 }
 
-/* Plansza gry – responsywna */
+/* Plansza gry – dopasowana do ekranu */
 #board {
-  width: 90%;
+  width: 90vw;
+  height: 90vw;
   max-width: 400px;
-  margin: 20px auto;
+  max-height: 400px;
+  margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-  grid-gap: 10px;
-  padding: 10px;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  gap: 5px;
+  padding: 5px;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.2);
   transition: background 1s ease-in-out;
   position: relative;
 }
 
-/* Styl kafelka – zachowanie proporcji kwadratu */
+/* Styl kafelka – każdy kafelek wypełnia komórkę siatki */
 .tile {
   width: 100%;
+  height: 100%;
   position: relative;
   cursor: pointer;
-  padding-top: 100%; /* Utrzymanie kwadratowego kształtu */
 }
 
 /* Kontener wewnętrzny – flip card inner */
 .flip-card-inner {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100%;
+  height: 100%;
   transition: transform 0.6s;
   transform-style: preserve-3d;
 }
@@ -95,7 +96,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2em;
+  font-size: 1.5em;
   transition: transform 0.6s, background-color 0.6s, box-shadow 0.6s;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   background: linear-gradient(145deg, #e0f7fa, #80deea);
@@ -238,7 +239,7 @@ body {
   overflow-y: auto;
 }
 
-/* Media queries dla mniejszych ekranów */
+/* Media queries dla bardzo małych ekranów */
 @media (max-width: 480px) {
   #info-bar {
     flex-direction: column;
