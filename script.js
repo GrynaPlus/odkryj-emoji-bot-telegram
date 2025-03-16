@@ -242,6 +242,21 @@ document.addEventListener("DOMContentLoaded", () => {
   function nextLevel() {
     updateRanking();
     level++;
+
+    // Wyświetl reklamę co 3 poziomy
+    if (level % 3 === 0) {
+      show_9093525({ 
+        type: 'inApp', 
+        inAppSettings: { 
+          frequency: 1, 
+          capping: 0, 
+          interval: 30, 
+          timeout: 1, 
+          everyPage: false 
+        } 
+      });
+    }
+
     if (mismatchDelay > 400) {
       mismatchDelay -= 50;
     }
