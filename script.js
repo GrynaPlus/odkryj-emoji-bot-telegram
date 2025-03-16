@@ -5,6 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let moves = 100;
   let mismatchDelay = 1000; // czas w milisekundach
   let flippedTiles = [];
+  let adRewardType = ""; // "moves" lub "hint"
+  
   const board = document.getElementById("board");
   const userNameDisplay = document.getElementById("user-name");
   const levelInfoDisplay = document.getElementById("level-info");
@@ -88,18 +90,36 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Listener przycisku do obejrzenia reklamy – wywołuje metodę wyświetlającą reklamę z Monetag
   document.getElementById("watch-ad-btn").addEventListener("click", () => {
     document.getElementById("watch-ad-btn").disabled = true;
-    setTimeout(() => {
-      moves += 100;
-      updateMoveDisplay();
-      adModal.classList.add("hidden");
-      document.getElementById("watch-ad-btn").disabled = false;
-      saveGameState();
-    }, 3000);
+    // Wywołanie reklamy rewarded interstitial z Monetag
+    monetagRewardedInterstitial.show({
+      onReward: function() {
+        if (adRewardType === "moves") {
+          moves += 100;
+          updateMoveDisplay();
+        } else if (adRewardType === "hint") {
+          useHint();
+        }
+        adModal.classList.add("hidden");
+        document.getElementById("watch-ad-btn").disabled = false;
+        saveGameState();
+      },
+      onError: function(err) {
+        console.error("Błąd podczas wyświetlania reklamy:", err);
+        // W przypadku błędu możemy ukryć modal i ponownie aktywować przycisk
+        adModal.classList.add("hidden");
+        document.getElementById("watch-ad-btn").disabled = false;
+      }
+    });
   });
 
-  document.getElementById("hint-btn").addEventListener("click", useHint);
+  // Listener przycisku podpowiedzi – ustawia nagrodę i wyświetla modal reklamy
+  document.getElementById("hint-btn").addEventListener("click", () => {
+    adRewardType = "hint";
+    adModal.classList.remove("hidden");
+  });
 
   function updateMoveDisplay() {
     moveCounterDisplay.innerText = ` | Ruchy: ${moves}`;
@@ -174,6 +194,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function flipTile() {
     if (moves <= 0) {
+      // Gdy ruchy się skończą, ustawiamy nagrodę na "moves" i pokazujemy modal reklamy
+      adRewardType = "moves";
       adModal.classList.remove("hidden");
       return;
     }
@@ -250,6 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return array;
   }
 
+  // Funkcja używana przy przydzielaniu nagrody w przypadku podpowiedzi
   function useHint() {
     const tiles = Array.from(document.querySelectorAll(".tile")).filter(tile => tile.dataset.flipped === "false" && !tile.classList.contains("matched"));
     const groups = {};
