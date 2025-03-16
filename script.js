@@ -5,14 +5,13 @@ document.addEventListener("DOMContentLoaded", () => {
   let moves = 100;
   let mismatchDelay = 1000; // czas w milisekundach
   let flippedTiles = [];
-  let adRewardType = ""; // "moves" lub "hint"
   
   const board = document.getElementById("board");
   const userNameDisplay = document.getElementById("user-name");
   const levelInfoDisplay = document.getElementById("level-info");
   const moveCounterDisplay = document.getElementById("move-counter");
   const usernameModal = document.getElementById("username-modal");
-  const adModal = document.getElementById("ad-modal");
+  // Modal reklamy został usunięty – wykorzystujemy standardowy dialog potwierdzenia
 
   const flipSound = document.getElementById("flip-sound");
   const matchSound = document.getElementById("match-sound");
@@ -90,35 +89,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Listener przycisku do obejrzenia reklamy – wywołuje metodę wyświetlającą reklamę z Monetag
-  document.getElementById("watch-ad-btn").addEventListener("click", () => {
-    document.getElementById("watch-ad-btn").disabled = true;
-    // Wywołanie reklamy rewarded interstitial z Monetag
-    monetagRewardedInterstitial.show({
-      onReward: function() {
-        if (adRewardType === "moves") {
-          moves += 100;
-          updateMoveDisplay();
-        } else if (adRewardType === "hint") {
-          useHint();
-        }
-        adModal.classList.add("hidden");
-        document.getElementById("watch-ad-btn").disabled = false;
-        saveGameState();
-      },
-      onError: function(err) {
-        console.error("Błąd podczas wyświetlania reklamy:", err);
-        // W przypadku błędu możemy ukryć modal i ponownie aktywować przycisk
-        adModal.classList.add("hidden");
-        document.getElementById("watch-ad-btn").disabled = false;
-      }
-    });
-  });
-
-  // Listener przycisku podpowiedzi – ustawia nagrodę i wyświetla modal reklamy
+  // Listener przycisku podpowiedzi – wyświetla potwierdzenie
   document.getElementById("hint-btn").addEventListener("click", () => {
-    adRewardType = "hint";
-    adModal.classList.remove("hidden");
+    if (confirm("Czy chcesz obejrzeć reklamę, aby otrzymać podpowiedź?")) {
+      show_9093525().then(() => {
+        useHint();
+      }).catch((err) => {
+        console.error("Błąd podczas wyświetlania reklamy:", err);
+      });
+    }
   });
 
   function updateMoveDisplay() {
@@ -194,9 +173,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function flipTile() {
     if (moves <= 0) {
-      // Gdy ruchy się skończą, ustawiamy nagrodę na "moves" i pokazujemy modal reklamy
-      adRewardType = "moves";
-      adModal.classList.remove("hidden");
+      if (confirm("Obejrzyj reklamę, aby otrzymać 100 ruchów!")) {
+        show_9093525().then(() => {
+          moves += 100;
+          updateMoveDisplay();
+          saveGameState();
+        }).catch((err) => {
+          console.error("Błąd podczas wyświetlania reklamy:", err);
+        });
+      }
       return;
     }
     if (this.dataset.flipped === "true" || this.classList.contains("matched") || flippedTiles.length === 2) return;
@@ -272,7 +257,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return array;
   }
 
-  // Funkcja używana przy przydzielaniu nagrody w przypadku podpowiedzi
+  // Funkcja przydzielająca podpowiedź – znajduje parę takich samych emoji
   function useHint() {
     const tiles = Array.from(document.querySelectorAll(".tile")).filter(tile => tile.dataset.flipped === "false" && !tile.classList.contains("matched"));
     const groups = {};
@@ -354,7 +339,6 @@ document.addEventListener("DOMContentLoaded", () => {
     saveGameState();
   }
 
-  // Używamy events: pageshow, visibilitychange oraz focus
   window.addEventListener("pageshow", () => {
     setTimeout(() => {
       hideUnmatchedTiles();
