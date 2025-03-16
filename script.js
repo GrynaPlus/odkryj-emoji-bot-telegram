@@ -29,8 +29,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let usedEmojiSet = []; // śledzenie użytych emoji
 
   // ---------------- Ranking ----------------
-  // Funkcja aktualizująca ranking użytkownika.
-  // Jeśli wpis dla danego użytkownika już istnieje, zostaje zaktualizowany; w przeciwnym razie dodany.
   function updateRanking() {
     const scoreEntry = {
       username,
@@ -45,16 +43,14 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       ranking.push(scoreEntry);
     }
-    // Sortowanie rankingu wg poziomu malejąco
     ranking.sort((a, b) => b.level - a.level);
     localStorage.setItem("memoryGameRanking", JSON.stringify(ranking));
   }
 
-  // Funkcja wyświetlająca ranking
   function showRanking() {
     const rankingModal = document.getElementById("ranking-modal");
     const rankingTableBody = document.querySelector("#ranking-table tbody");
-    rankingTableBody.innerHTML = ""; // czyścimy poprzednie wpisy
+    rankingTableBody.innerHTML = "";
 
     let ranking = JSON.parse(localStorage.getItem("memoryGameRanking")) || [];
     ranking.forEach((entry, index) => {
@@ -71,16 +67,13 @@ document.addEventListener("DOMContentLoaded", () => {
     rankingModal.classList.remove("hidden");
   }
 
-  // Zamykanie modalu rankingu
   document.getElementById("close-ranking-btn").addEventListener("click", () => {
     document.getElementById("ranking-modal").classList.add("hidden");
   });
 
-  // Event listener dla przycisku Ranking
   document.getElementById("ranking-btn").addEventListener("click", showRanking);
   // ---------------- Koniec sekcji Ranking ----------------
 
-  // Obsługa przycisku start
   document.getElementById("start-btn").addEventListener("click", () => {
     const input = document.getElementById("username-input").value.trim();
     if (input !== "") {
@@ -95,7 +88,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Obsługa przycisku "Obejrzyj reklamę"
   document.getElementById("watch-ad-btn").addEventListener("click", () => {
     document.getElementById("watch-ad-btn").disabled = true;
     setTimeout(() => {
@@ -107,21 +99,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 3000);
   });
 
-  // Obsługa przycisku "Podpowiedź"
   document.getElementById("hint-btn").addEventListener("click", useHint);
 
-  // Aktualizacja wyświetlania ruchów
   function updateMoveDisplay() {
     moveCounterDisplay.innerText = ` | Ruchy: ${moves}`;
   }
 
-  // Zapis stanu gry do localStorage
   function saveGameState() {
     const state = { username, level, moves, mismatchDelay };
     localStorage.setItem("memoryGameState", JSON.stringify(state));
   }
 
-  // Ładowanie stanu gry z localStorage
   function loadGameState() {
     const savedState = localStorage.getItem("memoryGameState");
     if (savedState) {
@@ -143,7 +131,6 @@ document.addEventListener("DOMContentLoaded", () => {
     loadGameState();
   }
 
-  // Funkcja zwracająca 18 unikalnych emoji
   function getUniqueEmojiSet() {
     let available = allEmojis.filter(emoji => !usedEmojiSet.includes(emoji));
     if (available.length < 18) {
@@ -156,16 +143,13 @@ document.addEventListener("DOMContentLoaded", () => {
     return selected;
   }
 
-  // Rozpoczęcie poziomu
   function startLevel() {
     board.innerHTML = "";
     flippedTiles = [];
     levelInfoDisplay.innerText = ` | Poziom: ${level}`;
-    // Przywrócenie domyślnego tła planszy
     board.style.background = "rgba(255, 255, 255, 0.2)";
     saveGameState();
 
-    // Przygotowanie par emoji
     const selectedEmojis = getUniqueEmojiSet();
     let emojiPairs = [];
     selectedEmojis.forEach(emoji => {
@@ -188,7 +172,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Obsługa kliknięcia kafelka
   function flipTile() {
     if (moves <= 0) {
       adModal.classList.remove("hidden");
@@ -211,19 +194,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Sprawdzenie dopasowania odsłoniętych kafelków
   function checkMatch() {
     const [tile1, tile2] = flippedTiles;
     if (tile1.dataset.emoji === tile2.dataset.emoji) {
       setTimeout(() => {
-        // Dodaj efekt starburst do obu dopasowanych kafelków
         [tile1, tile2].forEach(tile => {
           const star = document.createElement("div");
           star.classList.add("starburst");
           tile.appendChild(star);
           setTimeout(() => star.remove(), 600);
         });
-
         tile1.classList.add("matched");
         tile2.classList.add("matched");
         tile1.removeEventListener("click", flipTile);
@@ -233,10 +213,8 @@ document.addEventListener("DOMContentLoaded", () => {
         flippedTiles = [];
         saveGameState();
         if (document.querySelectorAll(".tile.matched").length === 36) {
-          // Dynamiczna zmiana tła przy ukończeniu poziomu
           board.style.background = "linear-gradient(135deg, #f6d365, #fda085)";
           showConfetti();
-          // Aktualizujemy ranking automatycznie po ukończeniu poziomu
           setTimeout(nextLevel, 3000);
         }
       }, 300);
@@ -254,9 +232,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Przejście do kolejnego poziomu
   function nextLevel() {
-    // Zaktualizuj ranking użytkownika przed przejściem do następnego poziomu
     updateRanking();
     level++;
     if (mismatchDelay > 400) {
@@ -266,7 +242,6 @@ document.addEventListener("DOMContentLoaded", () => {
     startLevel();
   }
 
-  // Funkcja tasująca (algorytm Fisher-Yates)
   function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -275,7 +250,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return array;
   }
 
-  // Funkcja podpowiedzi
   function useHint() {
     const tiles = Array.from(document.querySelectorAll(".tile")).filter(tile => tile.dataset.flipped === "false" && !tile.classList.contains("matched"));
     const groups = {};
@@ -300,20 +274,18 @@ document.addEventListener("DOMContentLoaded", () => {
     saveGameState();
   }
 
-  // Funkcja wyświetlająca konfetti przy ukończeniu poziomu
   function showConfetti() {
     const confettiCount = 50;
     const shapes = ['circle', 'triangle', 'star'];
     for (let i = 0; i < confettiCount; i++) {
       const confetti = document.createElement("div");
       confetti.classList.add("confetti");
-      // Losowy wybór kształtu
       const shape = shapes[Math.floor(Math.random() * shapes.length)];
       confetti.classList.add(shape);
       confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
       confetti.style.left = Math.random() * window.innerWidth + "px";
       confetti.style.top = "-20px";
-      const size = Math.random() * 10 + 5; // rozmiar od 5 do 15px
+      const size = Math.random() * 10 + 5;
       confetti.style.width = `${size}px`;
       confetti.style.height = `${size}px`;
       board.appendChild(confetti);
@@ -323,30 +295,66 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ---------------- Zapobieganie wyświetlaniu odsłoniętych kafelków ----------------
- // Obsługa widoczności strony – metoda pageshow (przy powrocie z bfcache)
-window.addEventListener("pageshow", (event) => {
-  // Jeśli strona była z bufora (persisted) lub zwykle
-  setTimeout(hideUnmatchedTiles, 10);
-});
+  // ---------------- Mechanizm zabezpieczający przed wyświetlaniem odsłoniętych emoji ----------------
+  let coverOverlay = null;
 
-// Obsługa visibilitychange z niewielkim opóźnieniem
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible") {
-    setTimeout(hideUnmatchedTiles, 10);
+  function addCoverOverlay() {
+    if (!coverOverlay) {
+      coverOverlay = document.createElement("div");
+      coverOverlay.style.position = "absolute";
+      coverOverlay.style.top = 0;
+      coverOverlay.style.left = 0;
+      coverOverlay.style.width = "100%";
+      coverOverlay.style.height = "100%";
+      coverOverlay.style.backgroundColor = "#fff";
+      coverOverlay.style.zIndex = "9999";
+      board.appendChild(coverOverlay);
+    }
   }
-});
 
-// Funkcja zakrywająca wszystkie niezapisane (nie dopasowane) kafelki
-function hideUnmatchedTiles() {
-  const tiles = document.querySelectorAll(".tile");
-  tiles.forEach(tile => {
-    if (!tile.classList.contains("matched") && tile.dataset.flipped === "true") {
-      tile.classList.remove("flipped");
-      tile.dataset.flipped = "false";
+  function removeCoverOverlay() {
+    if (coverOverlay) {
+      board.removeChild(coverOverlay);
+      coverOverlay = null;
+    }
+  }
+
+  function hideUnmatchedTiles() {
+    const tiles = document.querySelectorAll(".tile");
+    tiles.forEach(tile => {
+      if (!tile.classList.contains("matched") && tile.dataset.flipped === "true") {
+        tile.classList.remove("flipped");
+        tile.dataset.flipped = "false";
+      }
+    });
+    flippedTiles = [];
+    saveGameState();
+  }
+
+  // Używamy events: pageshow, visibilitychange oraz focus
+  window.addEventListener("pageshow", () => {
+    setTimeout(() => {
+      hideUnmatchedTiles();
+      removeCoverOverlay();
+    }, 10);
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      addCoverOverlay();
+    } else if (document.visibilityState === "visible") {
+      setTimeout(() => {
+        hideUnmatchedTiles();
+        removeCoverOverlay();
+      }, 10);
     }
   });
-  flippedTiles = [];
-  saveGameState();
-}
 
+  window.addEventListener("focus", () => {
+    setTimeout(() => {
+      hideUnmatchedTiles();
+      removeCoverOverlay();
+    }, 10);
+  });
+  // ---------------- Koniec zabezpieczenia ----------------
+});
